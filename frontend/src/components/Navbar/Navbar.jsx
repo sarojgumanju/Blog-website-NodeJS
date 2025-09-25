@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { logout } from "../utils/userSlice";
+import { logout } from "../../utils/userSlice";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useEffect } from "react";

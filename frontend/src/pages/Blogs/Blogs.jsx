@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import DisplayBlog from "../../../components/DisplayBlog/DisplayBlog";
-import usePagination from "../../../hooks/usePagination";
+import DisplayBlog from "../../components/DisplayBlog/DisplayBlog";
+import usePagination from "../../hooks/usePagination";
 
 const Blogs = () => {
   const [page, setPage] = useState(1);

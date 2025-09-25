@@ -1,5 +1,5 @@
-export { default as AuthForm } from "./pages/auth/AuthForm";
-export { default as Blogs } from "./pages/Blogs/Blogs";
-export {default as CreateBlog } from "./pages/Blogs/CreateBlog";
-export {default as BlogPage} from "./pages/Blogs/BlogPage";
-export { default as CommentBlog } from "./pages/Blogs/CommentBlog";
+export { default as AuthForm } from "./auth/AuthForm";
+export { default as Blogs } from "./Blogs/Blogs";
+export {default as CreateBlog } from "./Blogs/CreateBlog";
+export {default as BlogPage} from "./Blogs/BlogPage";
+export { default as SearchBlogs } from "./Blogs/SearchBlogs";

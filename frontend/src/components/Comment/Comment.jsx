@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsOpen } from "../../utils/commentSlice";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { setComments, setCommentsLikes } from "../../utils/seletedBlogSlice";
+import { setComments, setCommentLikes } from "../../utils/selectedBlogSlice";
 import { formatDate } from "../../utils/formatDate";
 
 function Comment() {
@@ -46,7 +46,7 @@ function Comment() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success(res.data.message);
-      dispatch(setCommentsLikes({ commentId, userId: user.id }));
+      dispatch(setCommentLikes({ commentId, userId: user.id }));
     } catch (error) {
       console.log(error);
     }
@@ -84,6 +84,9 @@ function Comment() {
       setEditId(null);
       setEditText("");
       toast.success(res.data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1);
     } catch (error) {
       toast.error(error.response.data.message);
     }

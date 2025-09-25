@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -9,9 +9,10 @@ import {
   addSelectedBlog,
   changeLike,
   removeSelectedBlog,
-} from "../../../utils/selectedBlogSlice";
-import { setIsOpen } from "../../../utils/commentSlice";
-import Comment from "../../../Comment/Comment";
+} from "../../utils/selectedBlogSlice";
+import { setIsOpen } from "../../utils/commentSlice";
+import Comment from "../../components/Comment/Comment";
+
 
 const BlogPage = () => {
   const { id } = useParams();
@@ -20,8 +21,7 @@ const BlogPage = () => {
   const { token, user } = useSelector((slice) => slice.user);
   const { likes, comments} = useSelector((slice) => slice.selectedBlog);
   const { isOpen } = useSelector((slice) => slice.commentBlog);
-
-
+  const [islike, setIslike] = useState(false);
   const navigate = useNavigate();
 
   // ---------------------------- fetch blog --------------------------------------------
@@ -100,7 +100,7 @@ const BlogPage = () => {
     // eslint-disable-next-line
   }, [id, location.pathname]);
 
-  const [islike, setIslike] = useState(false);
+  
   
 
   return (

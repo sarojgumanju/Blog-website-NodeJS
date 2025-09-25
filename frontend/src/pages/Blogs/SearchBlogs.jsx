@@ -1,8 +1,8 @@
-import React from 'react'
+
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom';
-import usePagination from '../../../hooks/usePagination';
-import DisplayBlog from '../../../components/DisplayBlog/DisplayBlog';
+import usePagination from '../../hooks/usePagination';
+import DisplayBlog from '../../components/DisplayBlog/DisplayBlog';
 
 const SearchBlogs = () => {
     const [page, setPage] = useState(1);

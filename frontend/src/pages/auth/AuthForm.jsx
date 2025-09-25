@@ -3,7 +3,7 @@ import {  Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import axios from "axios";
 import { useDispatch} from "react-redux";
-import { login } from "../../../utils/userSlice";
+import { login } from "../../utils/userSlice";
 
 
 const AuthForm = ({ type }) => {

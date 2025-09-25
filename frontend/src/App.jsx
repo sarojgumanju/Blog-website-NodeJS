@@ -1,11 +1,7 @@
-import React from "react";
 import {Routes,Route} from "react-router-dom"
 import "./App.css";
-import { Blogs, CreateBlog, AuthForm, BlogPage, CommentBlog } from "./pages";
-import Navbar from "./Navbar/Navbar";
-import SearchBlogs from "./pages/pages/Blogs/SearchBlogs";
-
-
+import Navbar from "./components/Navbar/Navbar";
+import { AuthForm, BlogPage, Blogs, CreateBlog, SearchBlogs } from "./pages";
 
 
 function App() {
@@ -17,7 +13,6 @@ function App() {
         <Route path="/signup" element={<AuthForm type={"signup"} />} />
         <Route path="/signin" element={<AuthForm type={"signin"} />} />
         <Route path="/create-blog" element={<CreateBlog />} />
-        <Route path="/comment-blog" element={<CommentBlog />} />
         <Route path="blog/:id" element={<BlogPage />} />
         <Route path="/edit-blog/:id" element={<CreateBlog />} />
         <Route path="/search" element={<SearchBlogs />} />

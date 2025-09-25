@@ -32,9 +32,9 @@ const DisplayBlog = ({ blogs }) => {
                 <p className="text-sm text-gray-500">
                   {formatDate(blog?.createdAt)}
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ">
                   <AiFillLike className="text-2xl" />
-                  <span>{blog.likes.length}</span>
+                  <span>{blog.likes?.length}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MdInsertComment className="text-2xl" />
