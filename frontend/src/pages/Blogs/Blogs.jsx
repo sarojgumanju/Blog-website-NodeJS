@@ -6,7 +6,7 @@ import usePagination from "../../hooks/usePagination";
 
 const Blogs = () => {
   const [page, setPage] = useState(1);
-  const {blogs, hasMore} = usePagination("blogs", {}, 1, page);
+  const {blogs, hasMore} = usePagination("blogs", {}, 4, page);
   
   // ----------------------------------------------------------------------------------
   // const [like, setLike] = useState(0, () => {
