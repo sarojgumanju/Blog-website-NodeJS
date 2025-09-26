@@ -5,18 +5,18 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+
+// ------------------------- create blog ----------------------------------
 const CreateBlog = () => {
   const { id } = useParams();
   // get token from local Storage
   // const token = JSON.parse(localStorage.getItem("token"));
   const { token } = useSelector((state) => state.user);
-  
-  const navigate = useNavigate();
-
   const { title, description, image } = useSelector(
     (slice) => slice.selectedBlog
   );
 
+  const navigate = useNavigate();
   const [blogData, setBlogData] = useState({
     title: "",
     description: "",
@@ -27,6 +27,8 @@ const CreateBlog = () => {
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isBlogPosting, setBlogPosting] = useState(false);
 
+
+// -------------------------- handle post blog ---------------------------------
   async function handlePostBlog() {
     setBlogPosting(true);
     try {
@@ -40,20 +42,47 @@ const CreateBlog = () => {
           },
         }
       );
-      console.log(response);
       toast.success(response.data.message);
       navigate("/");
     } catch (error) {
       toast.error(error.response.data.message);
-      console.error(error);
+      console.log(error);
+    } finally {
+      setBlogPosting(false);
     }
   }
 
+
+// ------------------------- handle update blog --------------------------------
+async function handleUpdateBlog() {
+  setBlogPosting(true);
+  try {
+    const response = await axios.patch(
+      `${import.meta.env.VITE_API_URL}/blogs/${id}`,
+      blogData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    toast.success(response.data.message);
+    navigate(`/blog/${id}`);
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.error(error);
+  } finally {
+    setBlogPosting(false);
+  }
+}
+
+
   async function fetchBlogById() {
     setBlogData({
-      title: title,
-      description: description,
-      image: image
+      title: title ?? "",
+      description: description ?? "",
+      image: image ?? null,
     }); 
   }
 
@@ -74,7 +103,7 @@ const CreateBlog = () => {
         <input
           type="text"
           id="title"
-          value={blogData.title}
+          value={blogData.title ?? ""}
           placeholder="Enter blog title"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none
         focus:ring-2 focus:ring-blue-400"
@@ -94,7 +123,7 @@ const CreateBlog = () => {
         <input
           type="text"
           id="description"
-          value = {blogData.description}
+          value = {blogData.description ?? ""}
           placeholder="Enter blog description"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none
           focus:ring-2 focus:ring-blue-400"
@@ -154,10 +183,13 @@ const CreateBlog = () => {
       <button
         type="submit"
         className="w-full bg-blue-300 p-2 text-1.5xl rounded-md"
-        onClick={handlePostBlog}
+        onClick={id ? handleUpdateBlog : handlePostBlog}
         disabled={isBlogPosting}
       >
-        {isBlogPosting ? "Posting..." : "Post Blog"}
+        {isBlogPosting 
+          ? (id? "Updating..." : "Post Blog")
+          : (id ? "Update Blog" : "Post Blog")
+        }
       </button>
       {isBlogPosting && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
