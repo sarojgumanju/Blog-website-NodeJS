@@ -6,10 +6,10 @@ import { AiFillLike } from "react-icons/ai";
 const DisplayBlog = ({ blogs }) => {
   return (
     <div>
-      {blogs.map((blog) => (
+      {blogs.map((blog, index) => (
         <Link
           to={`/blog/${blog?.blogId}`}
-          key={blog?._id}
+          key={`${blog?.blogId}-${index}`}
           className="my-10 flex flex-col-reverse md:flex-row gap-6 md:gap-10 border-b pb-10"
         >
           <div className="w-full md:w-[60%] flex flex-col gap-4">

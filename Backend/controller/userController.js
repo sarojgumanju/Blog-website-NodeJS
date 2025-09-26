@@ -1,9 +1,10 @@
 const User = require("../model/userSchema");
 const bcrypt = require("bcrypt");
-const { generateJWt } = require("../utils/generateToken");
+const { generateJWt, verifyJWT } = require("../utils/generateToken");
+const { sendVerificationEmail } = require("../utils/sendEmail");
 
 async function createUser(req, res) {
-     try {
+  try {
     // console.log(req.body);
 
     const { name, email, password } = req.body;
@@ -15,17 +16,33 @@ async function createUser(req, res) {
       });
     }
 
-    // checking if the inpur email exist or not
+    // checking if the input email exists or not
     const checkForExistingUser = await User.findOne({ email });
 
     // if same email exist it gives error
     if (checkForExistingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "User already registered.",
-      });
+      if (checkForExistingUser.verify) {
+        return res.status(400).json({
+          success: false,
+          message: "User already registered with this email.",
+        });
+      } else {
+        let verificationToken = await generateJWt({
+          email: checkForExistingUser.email,
+          id: checkForExistingUser._id,
+        });
+
+        await sendVerificationEmail(
+          checkForExistingUser.email,
+          verificationToken
+        );
+        return res.status(200).json({
+          success: true,
+          message: "Please check your email to verify your account.",
+        });
+      }
     }
-    
+
     // converting password to different type
     const hashpassword = await bcrypt.hash(password, 10); // 10 repeats the password by 10 times
 
@@ -38,17 +55,15 @@ async function createUser(req, res) {
 
     let token = await generateJWt({
       email: newUser.email,
-      id: newUser._id
-    })
+      id: newUser._id,
+    });
+
+    await sendVerificationEmail(newUser.email, token);
 
     return res.status(200).json({
       success: true,
-      message: "User create successfully",
-      user: {
-      },
-      token,
+      message: "Please check your email to verify your account.",
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -58,28 +73,26 @@ async function createUser(req, res) {
   }
 }
 
-
 //----------------------- get user ----------------------
 async function getUser(req, res) {
-     try {
-        const users = await User.find();
-        return res.status(200).json({
-          success: true,
-          message: "user fetched successfully",
-          users: users, // users matra lekehney hunxa kina ki key and value ko name same xa
-        });
-      } catch (error) {
-        return res.status(500).json({
-          success: false,
-          message: "server error",
-          error: error.message,
-        });
-      }
+  try {
+    const users = await User.find();
+    return res.status(200).json({
+      success: true,
+      message: "user fetched successfully",
+      users: users, // users matra lekehney hunxa kina ki key and value ko name same xa
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "server error",
+      error: error.message,
+    });
+  }
 }
 
-
 async function getUserById(req, res) {
-    try {
+  try {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
@@ -102,14 +115,17 @@ async function getUserById(req, res) {
   }
 }
 
-
 async function updateUser(req, res) {
-    try {
+  try {
     const { id } = req.params;
     const { name, email, password } = req.body;
-    
-    const updateeUser = await User.findByIdAndUpdate(id, {name, email, password}, {new: true});
-    
+
+    const updateeUser = await User.findByIdAndUpdate(
+      id,
+      { name, email, password },
+      { new: true }
+    );
+
     if (!updateeUser) {
       return res.status(404).json({
         success: false,
@@ -120,7 +136,7 @@ async function updateUser(req, res) {
     return res.status(200).json({
       success: true,
       message: "user updated successfully",
-      user: updateeUser
+      user: updateeUser,
     });
   } catch (error) {
     return res.status(500).json({
@@ -130,9 +146,8 @@ async function updateUser(req, res) {
   }
 }
 
-
 async function deleteUser(req, res) {
-    try {
+  try {
     const { id } = req.params;
     const deleteUser = await User.findByIdAndDelete(id);
     if (!deleteUser) {
@@ -154,7 +169,6 @@ async function deleteUser(req, res) {
   }
 }
 
-
 async function deleteAllUsers(req, res) {
   try {
     const result = await User.deleteMany({});
@@ -166,42 +180,60 @@ async function deleteAllUsers(req, res) {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "please try again"
+      message: "please try again",
     });
   }
 }
 
-
-async function userLogin(req,res) {
+async function userLogin(req, res) {
   try {
-    const { password, email} = req.body;
-    if(!password || !email){
-      return res
-        .status(400)
-        .json({
-          success: false, 
-          message: "Please fill the entire field."
-        });
+    const { password, email } = req.body;
+    if (!password || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all fields.",
+      });
     }
 
-    let checkForExistingUser = await User.findOne({email});
+    let checkForExistingUser = await User.findOne({ email });
+
+    if (!checkForExistingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User not registered",
+      });
+    }
+
+    if (!checkForExistingUser.verify) {
+      const verificationToken = await generateJWt({
+        email: checkForExistingUser.email,
+        id: checkForExistingUser._id,
+      });
+      await sendVerificationEmail(
+        checkForExistingUser.email,
+        verificationToken
+      );
+      return res.status(401).json({
+        success: false,
+        message: "Please verify your email. Verification link sent again.",
+      });
+    }
+
     let checkPassword = await bcrypt.compare(
       password,
       checkForExistingUser.password
     );
 
-    if(!checkPassword){
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid candidate",
-        })
+    if (!checkPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid candidate",
+      });
     }
 
     let token = await generateJWt({
       email: checkForExistingUser.email,
-      id: checkForExistingUser._id
+      id: checkForExistingUser._id,
     });
 
     // return res.status(201).json({
@@ -222,15 +254,57 @@ async function userLogin(req,res) {
       },
       token,
     });
-
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "User does not exist. Please sign up first", error: error.message
-      })
+    return res.status(500).json({
+      success: false,
+      message: "User does not exist. Please sign up first",
+      error: error.message,
+    });
   }
 }
 
-module.exports = { createUser, getUser, getUserById, updateUser, deleteUser, deleteAllUsers, userLogin}
+async function verifyToken(req, res) {
+  try {
+    const { verificationToken } = req.params;
+    const verifyToken = await verifyJWT(verificationToken);
+    if (!verifyToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid token, email expired.",
+      });
+    }
+
+    const { id } = verifyToken;
+    const user = await User.findByIdAndUpdate(
+      id,
+      { verify: true },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Email verified successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+}
+
+module.exports = {
+  createUser,
+  getUser,
+  getUserById,
+  updateUser,
+  deleteUser,
+  deleteAllUsers,
+  userLogin,
+  verifyToken
+};

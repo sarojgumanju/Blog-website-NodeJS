@@ -146,7 +146,7 @@ async function getBlogs(req, res) {
       path: "creator",
       select: "name email",
     }) // draft false xa vaney show hunxa
-    .sort({creator: -1})
+    .sort({createdAt: -1})
     .skip(skip)
     .limit(limit);
 

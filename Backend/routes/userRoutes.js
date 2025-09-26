@@ -7,6 +7,7 @@ const {
   deleteUser,
   deleteAllUsers,
   userLogin,
+  verifyToken,
 } = require("../controller/userController");
 const route = express.Router();
 
@@ -18,4 +19,7 @@ route.delete("/", deleteAllUsers);
 
 route.post("/signup", createUser);
 route.post("/signin", userLogin);
+
+route.get("/verify-email/:verificationToken", verifyToken)
+
 module.exports = route;

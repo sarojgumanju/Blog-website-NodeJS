@@ -100,9 +100,6 @@ const BlogPage = () => {
     // eslint-disable-next-line
   }, [id, location.pathname]);
 
-  
-  
-
   return (
     <div className="max-w-[1000px}">
       {blogData ? (
